@@ -1,0 +1,34 @@
+name: Replicate dbt Cloud Jobs from YAML
+run-name: Running dbt-jobs-as-code sync to replicate dbt Cloud jobs from YAML
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+    paths:
+      - 'jobs/**'  # Only trigger the workflow if files under the jobs/ directory are modified
+
+jobs:
+  run-python-script:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12.x"
+
+      - name: Install dbt-jobs-as-code
+        run: pip install dbt-jobs-as-code~=0.7.0
+
+      - name: Run dbt-jobs-as-code
+        run: dbt-jobs-as-code sync jobs/jobs.yml --vars-yml jobs/prod_vars.yml --limit-projects-envs-to-yml
+        env: 
+          DBT_API_KEY: "${{secrets.DBT_API_KEY}}"
+          # DBT_BASE_URL is optional
+          # DBT_BASE_URL: "${{secrets.DBT_BASE_URL}}"
