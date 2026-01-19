@@ -6,7 +6,6 @@ jobs:
     environment_id: "{{ environment_id }}"
     execute_steps:
     - "dbt run --select model1+"
-    - "dbt run --select model2+"
     execution:
       timeout_seconds: 0
     generate_docs: false
