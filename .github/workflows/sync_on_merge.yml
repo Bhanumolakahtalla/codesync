@@ -31,4 +31,4 @@ jobs:
         env: 
           DBT_API_KEY: "dbtc_IZTgpnc5fg4OlU_pNU5TAtSDNFhmhXoXP-pfrbvzbZhIaMW7cI"
           # DBT_BASE_URL is optional
-          # DBT_BASE_URL: "${{secrets.DBT_BASE_URL}}"
+          DBT_BASE_URL: "https://sx541.us1.dbt.com/"
