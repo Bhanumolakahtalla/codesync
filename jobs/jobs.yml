@@ -11,7 +11,7 @@ jobs:
     execution:
       timeout_seconds: 0
     generate_docs: false
-    name: "My Job 1"
+    name: "My Job 2"
     project_id: "{{ project_id }}"
     run_generate_sources: true
     schedule:
