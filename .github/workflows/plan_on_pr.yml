@@ -47,4 +47,4 @@ jobs:
         if: steps.set-vars-file.outputs.vars_file != ''  # Only run if vars_file is set
         run: dbt-jobs-as-code plan jobs/jobs.yml --vars-yml ${{ steps.set-vars-file.outputs.vars_file }} --limit-projects-envs-to-yml
         env: 
-          DBT_API_KEY: "${{secrets.DBT_API_KEY}}"
+          DBT_API_KEY: "dbtc_IZTgpnc5fg4OlU_pNU5TAtSDNFhmhXoXP-pfrbvzbZhIaMW7cI"
