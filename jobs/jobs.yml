@@ -3,7 +3,7 @@
 jobs:
   job1:
 
-    account_id: 43791
+    account_id: 70471823525116
     dbt_version: null
     deferring_job_definition_id: null
     environment_id: "{{ environment_id }}"
