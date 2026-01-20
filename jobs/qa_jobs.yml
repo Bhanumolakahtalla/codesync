@@ -15,11 +15,11 @@ jobs:
     schedule:
       cron: "0 */2 * * *"
     settings:
-      target_name: production
+      target_name: qa
       threads: 4
     state: 1
     triggers:
       git_provider_webhook: false
       github_webhook: false
       # we can add more complex logic in Jinja based on our variables
-      schedule: "{{ environment == 'prod' }}"
+      schedule: "{{ environment == 'qa' }}"

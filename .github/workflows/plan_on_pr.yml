@@ -4,47 +4,65 @@ run-name: Running dbt-jobs-as-code plan to see what is going to be changed/delet
 on:
   pull_request:
     branches:
-      - '**'  # Trigger on all branches
+      - '**'
     paths:
-      - 'jobs/**' # we only trigger when files change under the `jobs/` folder which is where we store our config
+      - 'jobs/**'
 
 env:
   BRANCH_FILE_MAP: |
     {
-      "main": "jobs/prod_vars.yml",
-      "qa": "jobs/qa_vars.yml"
+      "main": {
+        "vars": "jobs/prod_vars.yml",
+        "jobs": "jobs/prod_jobs.yml"
+      },
+      "gcp_code": {
+        "vars": "jobs/qa_vars.yml",
+        "jobs": "jobs/qa_jobs.yml"
+      }
     }
 
 jobs:
-  run-python-script:
+  run-dbt-jobs-as-code-plan:
     runs-on: ubuntu-latest
+
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.12.x"
+          python-version: "3.12"
 
       - name: Install dbt-jobs-as-code
-        run: pip install dbt-jobs-as-code~=0.6.0
-
-      - name: Set vars file based on branch
-        id: set-vars-file
         run: |
-          target_branch="${{ github.base_ref }}"
-          vars_file=$(echo '${{ env.BRANCH_FILE_MAP }}' | jq -r --arg branch "$target_branch" '.[$branch] // empty')
-          
-          if [[ -z "$vars_file" ]]; then
-            echo "Branch $branch not found in BRANCH_FILE_MAP. Exiting."
-            exit 0  # Exit gracefully if branch is not in the map
+          pip install dbt-jobs-as-code~=0.6.0 jq
+
+      - name: Resolve vars & jobs file based on target branch
+        id: resolve-files
+        run: |
+          TARGET_BRANCH="${{ github.base_ref }}"
+
+          VARS_FILE=$(echo '${{ env.BRANCH_FILE_MAP }}' | jq -r --arg b "$TARGET_BRANCH" '.[$b].vars // empty')
+          JOBS_FILE=$(echo '${{ env.BRANCH_FILE_MAP }}' | jq -r --arg b "$TARGET_BRANCH" '.[$b].jobs // empty')
+
+          if [[ -z "$VARS_FILE" || -z "$JOBS_FILE" ]]; then
+            echo "No config defined for branch: $TARGET_BRANCH"
+            exit 0
           fi
 
-          echo "vars_file=$vars_file" >> $GITHUB_OUTPUT
+          echo "vars_file=$VARS_FILE" >> $GITHUB_OUTPUT
+          echo "jobs_file=$JOBS_FILE" >> $GITHUB_OUTPUT
 
-      - name: Run dbt-jobs-as-code
-        if: steps.set-vars-file.outputs.vars_file != ''  # Only run if vars_file is set
-        run: dbt-jobs-as-code plan jobs/jobs.yml --vars-yml ${{ steps.set-vars-file.outputs.vars_file }} --limit-projects-envs-to-yml
-        env: 
-          DBT_API_KEY: "dbtc_IZTgpnc5fg4OlU_pNU5TAtSDNFhmhXoXP-pfrbvzbZhIaMW7cI"
+      - name: Run dbt-jobs-as-code plan
+        if: steps.resolve-files.outputs.vars_file != ''
+        run: |
+          echo "Using vars file: ${{ steps.resolve-files.outputs.vars_file }}"
+          echo "Using jobs file: ${{ steps.resolve-files.outputs.jobs_file }}"
+
+          dbt-jobs-as-code plan \
+            ${{ steps.resolve-files.outputs.jobs_file }} \
+            --vars-yml ${{ steps.resolve-files.outputs.vars_file }} \
+            --limit-projects-envs-to-yml
+        env:
+          DBT_API_KEY: ${{ secrets.DBT_API_KEY }}
