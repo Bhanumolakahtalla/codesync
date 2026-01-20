@@ -1,0 +1,74 @@
+name: Replicate dbt Cloud Jobs from YAML
+run-name: Running dbt-jobs-as-code sync to replicate dbt Cloud jobs from YAML
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+      - gcp_code
+    paths:
+      - 'jobs/**'
+
+env:
+  BRANCH_FILE_MAP: |
+    {
+      "main": {
+        "vars": "jobs/prod_vars.yml",
+        "jobs": "jobs/prod_jobs.yml"
+      },
+      "gcp_code": {
+        "vars": "jobs/qa_vars.yml",
+        "jobs": "jobs/qa_jobs.yml"
+      }
+    }
+
+jobs:
+  sync-dbt-jobs:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dbt-jobs-as-code
+        run: |
+          pip install dbt-jobs-as-code~=0.7.0 jq
+
+      - name: Resolve vars & jobs file based on target branch
+        id: resolve-files
+        run: |
+          TARGET_BRANCH="${{ github.base_ref }}"
+
+          VARS_FILE=$(echo '${{ env.BRANCH_FILE_MAP }}' | jq -r --arg b "$TARGET_BRANCH" '.[$b].vars // empty')
+          JOBS_FILE=$(echo '${{ env.BRANCH_FILE_MAP }}' | jq -r --arg b "$TARGET_BRANCH" '.[$b].jobs // empty')
+
+          if [[ -z "$VARS_FILE" || -z "$JOBS_FILE" ]]; then
+            echo "No config defined for branch: $TARGET_BRANCH"
+            exit 0
+          fi
+
+          echo "vars_file=$VARS_FILE" >> $GITHUB_OUTPUT
+          echo "jobs_file=$JOBS_FILE" >> $GITHUB_OUTPUT
+
+      - name: Run dbt-jobs-as-code sync
+        if: steps.resolve-files.outputs.vars_file != ''
+        run: |
+          echo "Syncing jobs using:"
+          echo "  Jobs file: ${{ steps.resolve-files.outputs.jobs_file }}"
+          echo "  Vars file: ${{ steps.resolve-files.outputs.vars_file }}"
+
+          dbt-jobs-as-code sync \
+            ${{ steps.resolve-files.outputs.jobs_file }} \
+            --vars-yml ${{ steps.resolve-files.outputs.vars_file }} \
+            --limit-projects-envs-to-yml
+        env:
+          DBT_API_KEY: ${{ secrets.DBT_API_KEY }}
+          DBT_BASE_URL: "https://sx541.us1.dbt.com/"

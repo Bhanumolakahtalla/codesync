@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/dbt-labs/dbt-jobs-as-code/main/src/dbt_jobs_as_code/schemas/load_job_schema.json
+
+jobs:
+  CUSTOMER:
+    account_id: 70471823525116
+    environment_id: "{{ environment_id }}"
+    execute_steps:
+    - "dbt run --select model1+"
+    execution:
+      timeout_seconds: 0
+    generate_docs: false
+    name: "{{ environment }} - "
+    project_id: "{{ project_id }}"
+    run_generate_sources: true
+    schedule:
+      cron: "0 */2 * * *"
+    settings:
+      target_name: production
+      threads: 4
+    state: 1
+    triggers:
+      git_provider_webhook: false
+      github_webhook: false
+      # we can add more complex logic in Jinja based on our variables 
+      schedule: "{{ environment == 'prod' }}"
