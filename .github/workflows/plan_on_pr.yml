@@ -15,7 +15,7 @@ env:
         "vars": "jobs/prod_vars.yml",
         "jobs": "jobs/prod_jobs.yml"
       },
-      "gcp_code": {
+      "gcp-code": {
         "vars": "jobs/qa_vars.yml",
         "jobs": "jobs/qa_jobs.yml"
       }
@@ -66,3 +66,4 @@ jobs:
             --limit-projects-envs-to-yml
         env:
           DBT_API_KEY: ${{ secrets.DBT_API_KEY }}
+
