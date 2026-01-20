@@ -21,5 +21,5 @@ jobs:
     triggers:
       git_provider_webhook: false
       github_webhook: false
-      # we can add more complex logic in Jinja based on our variables 
+      # we can add more complex logic in Jinja based on our variables
       schedule: "{{ environment == 'prod' }}"
