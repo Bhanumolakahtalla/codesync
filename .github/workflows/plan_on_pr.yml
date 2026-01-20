@@ -13,11 +13,11 @@ env:
     {
       "main": {
         "vars": "jobs/prod_vars.yml",
-        "jobs": "jobs/prod-jobs.yml"
+        "jobs": "jobs/prod_jobs.yml"
       },
       "gcp_code": {
         "vars": "jobs/qa_vars.yml",
-        "jobs": "jobs/qa-jobs.yml"
+        "jobs": "jobs/qa_jobs.yml"
       }
     }
 
