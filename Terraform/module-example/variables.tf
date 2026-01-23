@@ -15,3 +15,9 @@ variable "gcp_project_id" {
 variable "project_name" {
 	type = string
 }
+
+variable "gcp_service_account_key" {
+  type        = string
+  description = "GCP service account key"
+  sensitive   = true
+}
