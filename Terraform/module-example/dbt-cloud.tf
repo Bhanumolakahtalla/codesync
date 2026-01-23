@@ -14,5 +14,7 @@ module "dbt_cloud" {
   source = "../TF_Module"
 
   project_name           = var.project_name
+  gcp_service_account_key = var.gcp_service_account_key
 
 }
+
