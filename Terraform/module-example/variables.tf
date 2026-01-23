@@ -21,3 +21,9 @@ variable "gcp_service_account_key" {
   description = "GCP service account key"
   sensitive   = true
 }
+
+variable "DBT_CLOUD_TOKEN" {
+  type        = string
+  description = "DBT_CLOUD_TOKEN"
+  sensitive   = true
+}
