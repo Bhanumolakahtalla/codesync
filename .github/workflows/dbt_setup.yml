@@ -20,6 +20,9 @@ jobs:
 
       # # Providers auth
       # DBT_CLOUD_API_TOKEN: ${{ secrets.DBT_CLOUD_TOKEN }}
+    defaults:
+      run:
+        working-directory: Terraform/module-example/
 
     steps:
       - name: Checkout repo
@@ -41,3 +44,4 @@ jobs:
 
       - name: Terraform Apply
         run: terraform apply -auto-approve -input=false
+
