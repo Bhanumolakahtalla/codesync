@@ -15,6 +15,8 @@ module "dbt_cloud" {
 
   project_name           = var.project_name
   gcp_service_account_key = var.gcp_service_account_key
+  DBT_CLOUD_TOKEN = var.DBT_CLOUD_TOKEN
 
 }
+
 
