@@ -1,4 +1,4 @@
-variable "dbt_cloud_token" {}
+
 variable "dbt_cloud_account_id" {}
 
 variable "dbt_host_url" {
