@@ -22,7 +22,7 @@ variable "gcp_service_account_key" {
   sensitive   = true
 }
 
-variable "DBT_CLOUD_TOKEN" {
+variable "dbt_cloud_token" {
   type        = string
   description = "DBT_CLOUD_TOKEN"
   sensitive   = true
