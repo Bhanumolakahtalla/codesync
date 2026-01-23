@@ -16,7 +16,7 @@ jobs:
     env:
       # Terraform variables (auto-picked by TF)
       TF_VAR_gcp_service_account_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
-      TF_VAR_DBT_CLOUD_TOKEN: ${{ secrets.DBT_CLOUD_TOKEN }}
+      TF_VAR_dbt_cloud_token: ${{ secrets.DBT_CLOUD_TOKEN }}
       # TF_VAR_dbt_cloud_account_id: ${{ secrets.DBT_CLOUD_ACCOUNT_ID }}
 
       # # Providers auth
@@ -45,6 +45,7 @@ jobs:
 
       - name: Terraform Apply
         run: terraform apply -auto-approve -input=false
+
 
 
 
